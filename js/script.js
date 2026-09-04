@@ -1,5 +1,5 @@
 // ======================================================
-// TEXTO DA TELA INICIAL
+// TEXTO DA TELA INICIAL - OTIMIZADO PARA CELULAR
 // ======================================================
 
 const titleText = "Hoje é o seu aniversário.";
@@ -9,26 +9,52 @@ const description = document.getElementById("hero-description");
 const startButton = document.getElementById("start-button");
 
 let titleIndex = 0;
+let lastTypeTime = 0;
 
-function typeTitle() {
-  if (titleIndex < titleText.length) {
+function typeTitle(timestamp) {
+
+  if (!lastTypeTime) {
+    lastTypeTime = timestamp;
+  }
+
+  // Velocidade da digitação
+  if (timestamp - lastTypeTime >= 65) {
+
     titleElement.textContent += titleText.charAt(titleIndex);
-    titleIndex++;
 
-    setTimeout(typeTitle, 80);
+    titleIndex++;
+    lastTypeTime = timestamp;
+
+  }
+
+  if (titleIndex < titleText.length) {
+
+    requestAnimationFrame(typeTitle);
+
   } else {
+
     setTimeout(() => {
       description.classList.add("visible");
-    }, 500);
+    }, 400);
 
     setTimeout(() => {
       startButton.classList.add("visible");
-    }, 1200);
+    }, 900);
+
+    // Só cria as partículas DEPOIS que o título terminar
+    setTimeout(() => {
+      startParticles();
+    }, 1000);
+
   }
 }
 
-window.addEventListener("load", () => {
-  setTimeout(typeTitle, 600);
+window.addEventListener("DOMContentLoaded", () => {
+
+  setTimeout(() => {
+    requestAnimationFrame(typeTitle);
+  }, 300);
+
 });
 
 
@@ -84,8 +110,17 @@ function createParticle() {
   particlesContainer.appendChild(particle);
 }
 
-for (let i = 0; i < 90; i++) {
-  createParticle();
+function startParticles() {
+
+  const isMobile = window.innerWidth <= 768;
+
+  // Menos partículas no celular para não travar
+  const particleAmount = isMobile ? 35 : 80;
+
+  for (let i = 0; i < particleAmount; i++) {
+    createParticle();
+  }
+
 }
 
 
